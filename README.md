@@ -1,4 +1,4 @@
-$ dgernl
+# dgernl
 
 A journal application for cbt therapy
 
