@@ -1,6 +1,6 @@
 # dgernl
 
-A journal application for cbt therapy
+A journal application for cbt therapy (https://dgernl.herokuapp.com/)
 
 ## Running Locally
 
