@@ -1,7 +1,7 @@
 {
   "name": "node-js-getting-started",
   "version": "0.3.0",
-  "description": "A sample Node.js app using Express 4",
+  "description": "dgernl - a cbt-therapy journal",
   "engines": {
     "node": "12.x"
   },
@@ -21,12 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/endrawes0/dgernl"
   },
   "keywords": [
-    "node",
-    "heroku",
-    "express"
+    "cbt"
   ],
   "license": "MIT"
 }
