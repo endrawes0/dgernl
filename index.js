@@ -11,11 +11,22 @@ const pool = new Pool({
 	}
 });
 
-express()
-  .use(express.static(path.join(__dirname, 'public')))
+let app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
+  .post('/clientMessage', (req, res) => {
+		console.log(req.body.response);
+		
+		
+
+		res.send({message: "Nice to meet you, " + req.body.response});
+  })
   .get('/db', async (req, res) => {
 	  try {
 		  const client = await pool.connect();
@@ -28,4 +39,6 @@ express()
 		  res.send("Error " + err);
 	  }
   })
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+
+
