@@ -1,15 +1,8 @@
-const express = require('express')
-const path = require('path')
-const { Pool } = require('pg');
+const express = require('express');
+const path = require('path');
+const { handleClientMessage } = require('./dgernl');
 
 const PORT = process.env.PORT || 5000
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-		rejectUnauthorized: false
-	}
-});
 
 let app = express();
 
@@ -20,17 +13,16 @@ app.use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
-  .post('/clientMessage', (req, res) => {
-		console.log(req.body.response);
-		
-		
-
-		res.send({message: "Nice to meet you, " + req.body.response});
+  .post('/clientMessage', async (req, res) => {
+	console.log(req.body);
+	handleClientMessage(req.body, function(response){
+		res.send(response);
+	});
   })
   .get('/db', async (req, res) => {
 	  try {
 		  const client = await pool.connect();
-		  const result = await client.query('SELECT * FROM test_table');
+		  const result = await client.query('SELECT * FROM "user"');
 		  const results = { 'results': (result) ? result.rows : null };
 		  res.render(`pages/db`, results);
 		  client.release();

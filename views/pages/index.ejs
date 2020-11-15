@@ -4,7 +4,45 @@
   <% include ../partials/header.ejs %>
   <script>
 
-    async function sendResponseToServer(){
+    let cookie = document.cookie.split('; ').reduce((prev, current) => {
+      const [name, value] = current.split('=');
+      prev[name] = value;
+      return prev;
+    }, {});
+
+    function setEntrySuccess(entry, message){
+      entry.placeholder = message;
+      entry.classList.remove("failure");
+    }
+
+    function setEntryFailure(entry, message){
+      entry.placeholder = message;
+      entry.classList.add("failure");
+    }
+
+    function setCookies(header){
+      let cookie = "";
+      for(const prop in header){
+        cookie += prop + "=" + header[prop] + "; ";
+      }
+      console.log("Setting Cookie: " + cookie);
+      document.cookie = cookie + "path=/; ";
+    }
+
+    async function init(){
+      const entry = document.getElementById("entry");
+
+      if(cookie.questionId == "who" || !cookie.userName){
+        setEntrySuccess(entry, "Start here. What is your name?");
+        cookie.questionId = "who";
+      }else{
+        setEntrySuccess(entry, "Good to see you again, " + cookie.userName + ". What would you like to do?");
+        cookie.questionId = "command";
+      }
+
+    }
+
+    async function sendMessageToServer(){
       const entry = document.getElementById("entry");
       const userResponse = entry.value;
 
@@ -17,23 +55,30 @@
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          response: userResponse
+          header: cookie,
+          message: userResponse
         })
       });
 
-      const content = await serverResponse.json();
+      const response = await serverResponse.json();
 
-      console.log("Server Message: " + JSON.stringify(content));
-      
-      entry.placeholder = content.message;
+      console.log("Server Message: " + JSON.stringify(response));
+
+      if(response.success){
+        setCookies(response.header);
+        setEntrySuccess(entry, response.message);
+      }else{
+        setEntryFailure(entry, response.message);
+      }
       entry.value = "";
+      
     }
 
 
   </script>
 </head>
 
-<body>
+<body onload="init()">
 
   <% include ../partials/nav.ejs %>
 
@@ -48,7 +93,7 @@
   </div>
   <div class="container text-center">
     <div class="form-group row">
-        <input type="text" class="form-control" id="entry" autocomplete="off" placeholder="Start here. What is your name?" onchange="sendResponseToServer()">
+        <input type="text" class="form-control" id="entry" autocomplete="off"  onchange="sendMessageToServer()">
     </div>
   </div>
 </body>
