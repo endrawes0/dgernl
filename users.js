@@ -9,30 +9,49 @@ const pool = new Pool({
 
 const lookupByName = async (userName) => {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM "user" WHERE user_name = $1', [userName])
-    const results = { 'results': (result) ? result.rows : null };
+    const results = await client.query('SELECT user_id, user_name FROM "user" WHERE user_name = $1', [userName])
+    const result = results.rows.length ? results.rows[0] : undefined;
     client.release();
 
-    return results.results.length > 0 ? results.results[0] : undefined;
+    if(result){
+        return {
+            userId: result.user_id,
+            userName: result.user_name
+        };
+    }
 }
 
 const lookupById = async (userId) => {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM "user" WHERE user_id = $1', [userId])
-    const results = { 'results': (result) ? result.rows : null };
+    const results = await client.query('SELECT user_id, user_name FROM "user" WHERE user_id = $1', [userId])
+    const result = results.rows.length ? results.rows[0] : undefined;
     client.release();
 
-    return results.results.length > 0 ? results.results[0] : undefined;
+    if(result){
+        return {
+            userId: result.user_id,
+            userName: result.user_name
+        };
+    }
 }
 
 const create = async (userName) => {
     const client = await pool.connect();
-    const result = await client.query('INSERT INTO "user" (user_name) VALUES ($1)', [userName]);
-    console.log(result);
+    await client.query('INSERT INTO "user" (user_name) VALUES ($1)', [userName]);
+    return lookupByName(userName);
+}
 
-    return result;
+const getAllUsers = async () => {
+    const client = await pool.connect();
+    const results = await client.query('SELECT user_id, user_name FROM "user"');
+
+    return results.rows.map(element => ({
+        userId: element.user_id,
+        userName: element.user_name,
+    }));
 }
 
 exports.lookupByName = lookupByName;
 exports.lookupById = lookupByName;
 exports.create = create
+exports.getAllUsers = getAllUsers;

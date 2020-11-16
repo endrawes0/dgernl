@@ -20,6 +20,13 @@
       entry.classList.add("failure");
     }
 
+    function clearCookies(){
+      document.cookie.split(";")
+        .forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+    }
+
     function setCookies(header){
       let cookie = "";
       for(const prop in header){
@@ -32,12 +39,12 @@
     async function init(){
       const entry = document.getElementById("entry");
 
-      if(cookie.questionId == "who" || !cookie.userName){
+      if(cookie.questionId == "who" || !cookie.user || !cookie.user.userName){
         setEntrySuccess(entry, "Start here. What is your name?");
         cookie.questionId = "who";
       }else{
         setEntrySuccess(entry, "Good to see you again, " + cookie.userName + ". What would you like to do?");
-        cookie.questionId = "command";
+        cookie.questionId = "do";
       }
 
     }
@@ -45,10 +52,15 @@
     async function sendMessageToServer(){
       const entry = document.getElementById("entry");
       const userResponse = entry.value;
+      entry.value = "";
 
-      console.log("User Response: " + userResponse);
+      if(userResponse === "clear"){
+        clearCookies();
+        init();
+        return fetch();
+      }
 
-      const serverResponse = await fetch('clientMessage', {
+      const clientMessage = {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -58,17 +70,20 @@
           header: cookie,
           message: userResponse
         })
-      });
+      }
 
+      console.log("Sending Client Message: " + JSON.stringify(clientMessage));
+
+      const serverResponse = await fetch('clientMessage', clientMessage);
       const response = await serverResponse.json();
 
-      console.log("Server Message: " + JSON.stringify(response));
+      console.log("Server Response: " + JSON.stringify(response));
 
       if(response.success){
         setCookies(response.header);
-        setEntrySuccess(entry, response.message);
+        setEntrySuccess(entry, response.response);
       }else{
-        setEntryFailure(entry, response.message);
+        setEntryFailure(entry, response.response);
       }
       entry.value = "";
       
