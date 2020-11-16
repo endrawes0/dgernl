@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div class="container">
+<h2>Questions</h2>
+
+<ul>
+    <% questionList.forEach(function(r) { %>
+        <li><%= r.questionId %> - <%= r.prompt %> (<%= r.responseType %>) </li>
+    <% }); %>
+</ul>
+
+</div>
+
+</body>
+</html>

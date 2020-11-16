@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const users = require('./users');
+const questions = require('./questions');
 const { handleClientMessage } = require('./dgernl');
 
 const PORT = process.env.PORT || 5000
@@ -18,14 +19,22 @@ app.use(express.static(path.join(__dirname, 'public')))
 	console.log("Client Message: " + JSON.stringify(req.body));
 	handleClientMessage(req.body, (response) => res.send(response));
   })
-  .get('/db', async (req, res) => {
-	  try {
-		  const userList = await users.getAllUsers();
-		  res.render(`pages/db`, {userList});
-	  } catch(err) {
-		  console.error(err);
-		  res.send("Error " + err);
-	  }
-  })
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
-  
+  .get('/users', async (req, res) => {
+	try {
+		const userList = await users.getAll();
+		res.render(`pages/users`, {userList});
+	} catch(err) {
+		console.error(err);
+		res.send("Error " + err);
+	}
+	})
+	.get('/questions', async (req, res) => {
+		try {
+			const questionList = await questions.getAll();
+			res.render(`pages/questions`, {questionList});
+		} catch(err) {
+			console.error(err);
+			res.send("Error " + err);
+		}
+	})
+	.listen(PORT, () => console.log(`Listening on ${ PORT }`));

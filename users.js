@@ -42,7 +42,7 @@ const create = async (userName) => {
     return lookupByName(userName);
 }
 
-const getAllUsers = async () => {
+const getAll = async () => {
     const client = await pool.connect();
     const results = await client.query('SELECT user_id, user_name FROM "user"');
 
@@ -55,4 +55,4 @@ const getAllUsers = async () => {
 exports.lookupByName = lookupByName;
 exports.lookupById = lookupByName;
 exports.create = create
-exports.getAllUsers = getAllUsers;
+exports.getAll = getAll;
