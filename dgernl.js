@@ -1,4 +1,3 @@
-const { response } = require('express');
 const users =  require('./users.js');
 
 const Interrupts = {
@@ -6,12 +5,12 @@ const Interrupts = {
 };
 
 const Questions = {
-    "who": (message, callback) => {
+    "who": async (message, callback) => {
         let name = message.message;
-        let user = users.lookupByName(name);
+        let user = await users.lookupByName(name);
         let response = "";
         if(user){
-            response = "Good to see you, " + name + "! What [action] would you like to do?";
+            response = "Good to see you, " + user.userName + "! What [action] would you like to do?";
             message.header.user = JSON.stringify(user);
         }else{
             response = "Very nice to meet you, " + name + ". I will remember you next time you visit. ";

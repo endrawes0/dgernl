@@ -11,6 +11,7 @@ const lookupByName = async (userName) => {
     const client = await pool.connect();
     const results = await client.query('SELECT user_id, user_name FROM "user" WHERE user_name = $1', [userName])
     const result = results.rows.length ? results.rows[0] : undefined;
+    console.log("SELECT Results: " + JSON.stringify(result));
     client.release();
 
     if(result){
@@ -18,7 +19,7 @@ const lookupByName = async (userName) => {
             userId: result.user_id,
             userName: result.user_name
         };
-    }
+    }else return undefined;
 }
 
 const lookupById = async (userId) => {
